@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  build:
     runs-on: ${{(matrix.platform == 'Linux' && 'ubuntu-22.04') || (matrix.platform == 'Windows' && 'windows-2022') || (matrix.platform == 'macOS' && 'macos-14')}}
     strategy:
       matrix:
@@ -55,7 +55,7 @@ jobs:
           retention-days: 21
 
   # alternative to "test" - full texlive image by Island of TeX available at https://gitlab.com/islandoftex/images/texlive
-  test-on-iot-texlive:
+  build-on-iot-texlive:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
