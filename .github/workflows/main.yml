@@ -50,7 +50,7 @@ jobs:
       - name: Archive .pdf
         uses: actions/upload-artifact@v4
         with:
-          name: PDF
+          name: PDF-${{matrix.engine}}-${{matrix.texlive}}-${{matrix.platform}}
           path: "*.pdf"
           retention-days: 21
 
