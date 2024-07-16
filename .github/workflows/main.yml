@@ -1,0 +1,73 @@
+name: Automated testing
+
+# Currently we run in two situations:
+on:
+  # 1) Whenever someone pushes to a branch
+  push:
+  # 2) Whenever a pull request is opened, reopened or gets new commits.
+  pull_request:
+# This implies that for every push to a local branch in our repo for which a
+# pull request is open this runs twice. But it's important to ensure that pull
+# requests get tested even if their branch comes from a fork.
+
+# Cancel running builds on push on the same branch or pull request
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ${{(matrix.platform == 'Linux' && 'ubuntu-22.04') || (matrix.platform == 'Windows' && 'windows-2022') || (matrix.platform == 'macOS' && 'macos-14')}}
+    strategy:
+      matrix:
+        # We use more redable names here. The enables updating the concrete runners without changing the names
+        platform: [Linux, Windows, macOS]
+        texlive: [2022, 2023, 2024]
+        engine: [pdflatex, xelatex, lualatex]
+    name: "Test suite ${{ matrix.platform }}, TeXLive ${{ matrix.texlive }}, Engine ${{ matrix.engine }}"
+    steps:
+      # Boilerplate
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Install TeX Live
+        if: ${{ matrix.texlive == 2024 }}
+        uses: zauguin/install-texlive@v3
+        with:
+          # The list of packages to install is in a separate file under .github/tl_packages
+          # to allow reuse.
+          package_file: .github/tl_packages
+      - name: Install TeX Live
+        if: ${{ matrix.texlive < 2024 }}
+        # Similar action to zauguin/install-texlive@v3, has some drawbacks in mirror selection
+        uses: teatimeguest/setup-texlive-action@v3
+        with:
+          package-file: .github/tl_packages
+          version: ${{ matrix.texlive }}
+      - name: Run latexmk
+        run: "latexmk --${{(matrix.engine == 'pdflatex' && 'pdf') || (matrix.engine == 'xelatex' && 'xelatex') || (matrix.engine == 'lualatex' && 'lualatex')}}  mydocument"
+      - name: Archive .pdf
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF
+          path: "*.pdf"
+          retention-days: 21
+
+  # alternative to "test" - full texlive image by Island of TeX available at https://gitlab.com/islandoftex/images/texlive
+  test-on-iot-texlive:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        image: ["TL2022-historic", "TL2023-historic", "latest"]
+        engine: [pdflatex, xelatex, lualatex]
+    name: "Test suite Linux (Island) on ${{ matrix.image }}, ${{ matrix.engine }}"
+    container:
+      image: registry.gitlab.com/islandoftex/images/texlive:${{ matrix.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Run latexmk
+        run: "latexmk --${{(matrix.engine == 'pdflatex' && 'pdf') || (matrix.engine == 'xelatex' && 'xelatex') || (matrix.engine == 'lualatex' && 'lualatex')}}  mydocument"

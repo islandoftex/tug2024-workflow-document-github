@@ -1,0 +1,13 @@
+# DEPP.rc 
+# latexmk configuration file to detect TeX Live dependendencies
+
+$pdf_mode=4;
+
+&set_tex_cmds('%O'
+        . '\'\RequirePackage{depp}\input{%S}\''
+        );
+
+# Set jobname to input filename to avoid use of fallback value “texput”
+if ($jobname == "" ) {
+	$jobname = '%A';
+}
