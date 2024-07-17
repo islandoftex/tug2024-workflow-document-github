@@ -29,8 +29,6 @@ jobs:
       # Boilerplate
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          show-progress: 'false'
       - name: Install TeX Live
         if: ${{ matrix.texlive == 2024 }}
         uses: zauguin/install-texlive@v3
@@ -67,7 +65,5 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          show-progress: 'false'
       - name: Run latexmk
         run: "latexmk --${{(matrix.engine == 'pdflatex' && 'pdf') || (matrix.engine == 'xelatex' && 'xelatex') || (matrix.engine == 'lualatex' && 'lualatex')}}  mydocument"
