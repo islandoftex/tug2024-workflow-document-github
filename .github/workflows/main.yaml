@@ -24,7 +24,7 @@ jobs:
         platform: [Linux, Windows, macOS]
         texlive: [2022, 2023, 2024]
         engine: [pdflatex, xelatex, lualatex]
-    name: "Test suite ${{ matrix.platform }}, TeXLive ${{ matrix.texlive }}, Engine ${{ matrix.engine }}"
+    name: "Build PDF on ${{ matrix.platform }}, TeXLive ${{ matrix.texlive }}, Engine ${{ matrix.engine }}"
     steps:
       # Boilerplate
       - name: Checkout repository
