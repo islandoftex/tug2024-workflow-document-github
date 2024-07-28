@@ -52,7 +52,7 @@ jobs:
           path: "*.pdf"
           retention-days: 21
 
-  # alternative to "test" - full texlive image by Island of TeX available at https://gitlab.com/islandoftex/images/texlive
+  # alternative to "build" - full texlive image by Island of TeX available at https://gitlab.com/islandoftex/images/texlive
   build-on-iot-texlive:
     runs-on: ubuntu-22.04
     strategy:
