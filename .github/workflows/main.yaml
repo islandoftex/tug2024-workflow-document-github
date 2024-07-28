@@ -57,7 +57,7 @@ jobs:
       - name: move pdf
         run: mkdir -p build && mv *.pdf build/.
       - uses: crazy-max/ghaction-github-pages@v4
-        if: ${{(matrix.platform == 'Linux') && (matrix.texlive == '2024') && (matrix.engine == 'pdflatex') && (github.ref == 'refs/heads/main')}}
+        if: ${{(matrix.platform == 'Linux') && (matrix.texlive == '2024') && (matrix.engine == 'lualatex') && (github.ref == 'refs/heads/main')}}
         with:
           target_branch: pdf-output
           build_dir: build
