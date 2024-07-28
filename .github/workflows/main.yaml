@@ -15,6 +15,9 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ${{(matrix.platform == 'Linux' && 'ubuntu-22.04') || (matrix.platform == 'Windows' && 'windows-2022') || (matrix.platform == 'macOS' && 'macos-14')}}
@@ -51,6 +54,15 @@ jobs:
           name: PDF-${{matrix.engine}}-${{matrix.texlive}}-${{matrix.platform}}
           path: "*.pdf"
           retention-days: 21
+      - name: move pdf
+        run: mkdir -p build && mv *.pdf build/.
+      - uses: crazy-max/ghaction-github-pages@v4
+        if: ${{(matrix.platform == 'Linux') && (matrix.texlive == '2024') && (matrix.engine == 'lualatex') && (github.ref == 'refs/heads/main')}}
+        with:
+          target_branch: pdf-output
+          build_dir: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # alternative to "build" - full texlive image by Island of TeX available at https://gitlab.com/islandoftex/images/texlive
   build-on-iot-texlive:
